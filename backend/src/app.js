@@ -13,7 +13,7 @@ const userRoutes = require("./routes/users");
 const adminRoutes = require("./routes/admin");
 
 const app = express();
-
+const path = require("path");
 app.use(helmet());
 app.use(
   cors({
@@ -44,6 +44,11 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 app.use(errorHandler);
 

@@ -6,6 +6,7 @@ const { connectRedis } = require("./config/redis");
 const logger = require("./config/logger");
 const seedDatabase = require("./utils/seed");
 
+
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
