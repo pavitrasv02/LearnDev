@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "olp-backend"
+    metrics_path: /health
+    static_configs:
+      - targets: ["backend:5000"]
+        labels:
+          service: "olp-api"
+
+  - job_name: "nginx"
+    static_configs:
+      - targets: ["nginx:80"]
+        labels:
+          service: "nginx-proxy"

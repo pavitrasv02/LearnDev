@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: olp-frontend
+  namespace: olp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: olp-frontend
+  template:
+    metadata:
+      labels:
+        app: olp-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: your-dockerhub/olp-frontend:latest
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: olp
+spec:
+  selector:
+    app: olp-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP

@@ -1,0 +1,125 @@
+// Online Learning Platform — Full Stack Jenkins Declarative Pipeline
+// GitHub → Build → Test → Docker → Deploy → Health Check
+
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME           = 'online-learning-platform'
+        DOCKER_REGISTRY    = 'docker.io'
+        BACKEND_IMAGE      = 'olp-backend'
+        FRONTEND_IMAGE     = 'olp-frontend'
+        COMPOSE_PROJECT    = 'olp'
+        GIT_REPO_URL       = 'https://github.com/YOUR_USERNAME/online-learning-platform.git'
+        GIT_BRANCH         = 'main'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timestamps()
+        timeout(time: 45, unit: 'MINUTES')
+    }
+
+    triggers {
+        pollSCM('H/5 * * * *')
+        // GitHub webhook: http://<jenkins>:8080/github-webhook/
+    }
+
+    stages {
+        stage('Clone GitHub Repository') {
+            steps {
+                echo 'Stage 1: Cloning repository...'
+                git branch: "${GIT_BRANCH}",
+                    url: "${GIT_REPO_URL}",
+                    credentialsId: 'github-credentials'
+                sh 'ls -la'
+            }
+        }
+
+        stage('Install & Lint') {
+            parallel {
+                stage('Backend Dependencies') {
+                    steps {
+                        dir('backend') {
+                            sh 'npm ci || npm install'
+                        }
+                    }
+                }
+                stage('Frontend Dependencies') {
+                    steps {
+                        dir('frontend') {
+                            sh 'npm ci || npm install'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                echo 'Stage 3: Building Docker images...'
+                sh """
+                    docker compose build --no-cache backend frontend
+                    docker tag ${COMPOSE_PROJECT}-backend ${BACKEND_IMAGE}:${BUILD_NUMBER}
+                    docker tag ${COMPOSE_PROJECT}-backend ${BACKEND_IMAGE}:latest
+                    docker tag ${COMPOSE_PROJECT}-frontend ${FRONTEND_IMAGE}:${BUILD_NUMBER}
+                    docker tag ${COMPOSE_PROJECT}-frontend ${FRONTEND_IMAGE}:latest
+                """
+            }
+        }
+
+        stage('Deploy Stack') {
+            steps {
+                echo 'Stage 4: Deploying full stack with Docker Compose...'
+                sh """
+                    docker compose down 2>/dev/null || true
+                    docker compose up -d --build
+                    sleep 15
+                """
+            }
+        }
+
+        stage('Health Checks') {
+            steps {
+                echo 'Stage 5: Running health checks...'
+                sh """
+                    curl -f http://localhost/health || exit 1
+                    curl -f http://localhost/api/health || exit 1
+                    curl -f -s -o /dev/null -w '%{http_code}' http://localhost/ | grep -E '200|304'
+                """
+                echo 'All health checks passed.'
+            }
+        }
+
+        stage('Deployment Verification') {
+            steps {
+                echo 'Stage 6: Verifying deployment...'
+                sh 'docker compose ps'
+                sh 'docker images | grep olp || true'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo """
+            ╔══════════════════════════════════════════════════════════╗
+            ║  FULL STACK CI/CD DEPLOYMENT SUCCESSFUL                  ║
+            ╠══════════════════════════════════════════════════════════╣
+            ║  App URL     : http://localhost                          ║
+            ║  API Health  : http://localhost/api/health               ║
+            ║  Grafana     : http://localhost:3001 (profile: monitoring) ║
+            ║  Prometheus  : http://localhost:9090                     ║
+            ║  Build       : #${BUILD_NUMBER}                            ║
+            ╚══════════════════════════════════════════════════════════╝
+            """
+        }
+        failure {
+            echo 'Pipeline failed. Check logs: docker compose logs'
+            sh 'docker compose logs --tail=50 2>/dev/null || true'
+        }
+        always {
+            cleanWs()
+        }
+    }
+}
