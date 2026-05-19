@@ -14,7 +14,18 @@ const adminRoutes = require("./routes/admin");
 
 const app = express();
 const path = require("path");
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      },
+    },
+  })
+);
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN?.split(",") || ["http://localhost:3000", "http://localhost"],
