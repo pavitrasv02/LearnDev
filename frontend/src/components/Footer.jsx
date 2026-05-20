@@ -3,9 +3,9 @@ import { GraduationCap, Github, Twitter, Linkedin, Youtube } from "lucide-react"
 
 const social = [
   { icon: Github, href: "https://github.com", label: "GitHub" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
+  { icon: Instagram, href: "https://twitter.com", label: "Twitter" },
   { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Youtube, href: "https://youtube.com", label: "YouTube" },
+  { icon: Whatsapp, href: "https://youtube.com", label: "YouTube" },
 ];
 
 export default function Footer() {
