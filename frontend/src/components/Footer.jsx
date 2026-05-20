@@ -10,7 +10,7 @@ const social = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950">
+    <footer className="border-t border-red-200 dark:border-white-800 bg-green-50 dark:bg-gray-950">
       <div className="section-padding grid grid-cols-1 md:grid-cols-4 gap-12">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2 mb-4">
@@ -39,7 +39,7 @@ export default function Footer() {
         </div>
         <div>
           <h4 className="font-semibold mb-4">Platform</h4>
-          <ul className="space-y-2 text-gray-600 dark:text-gray-400">
+          <ul className="space-y-2 text-red-600 dark:text-gray-400">
             <li><Link to="/courses" className="hover:text-brand-500">Courses</Link></li>
             <li><Link to="/dashboard" className="hover:text-brand-500">Dashboard</Link></li>
             <li><Link to="/#pricing" className="hover:text-brand-500">Pricing</Link></li>
