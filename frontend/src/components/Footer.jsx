@@ -17,7 +17,7 @@ export default function Footer() {
             <div className="p-2 rounded-xl bg-gradient-to-br from-brand-500 to-accent-violet">
               <GraduationCap className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold gradient-text">LearnDev</span>
+            <span className="text-xl font-bold gradient-text">Devops</span>
           </div>
           <p className="text-gray-600 dark:text-gray-400 max-w-md">
             Production-grade online learning platform with Docker, Kubernetes, Redis, and full DevOps pipeline.
