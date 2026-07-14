@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Search, Pencil, Trash2, Eye, BookOpen } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Eye, BookOpen, Layers } from "lucide-react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { adminApi } from "../../api/adminApi";
@@ -162,13 +162,16 @@ export default function AdminCourses() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
-                        <Link to={`/courses/${course.slug}`} target="_blank" className="p-2 rounded-lg hover:bg-white/10 text-gray-400">
+                        <Link to={`/courses/${course.slug}`} target="_blank" className="p-2 rounded-lg hover:bg-white/10 text-gray-400" title="Preview">
                           <Eye className="w-4 h-4" />
                         </Link>
-                        <button onClick={() => { setEditing(course); setModalOpen(true); }} className="p-2 rounded-lg hover:bg-brand-500/20 text-brand-400">
+                        <Link to={`/admin/courses/${course._id}/builder`} className="p-2 rounded-lg hover:bg-violet-500/20 text-violet-400" title="Manage Content">
+                          <Layers className="w-4 h-4" />
+                        </Link>
+                        <button onClick={() => { setEditing(course); setModalOpen(true); }} className="p-2 rounded-lg hover:bg-brand-500/20 text-brand-400" title="Edit details">
                           <Pencil className="w-4 h-4" />
                         </button>
-                        <button onClick={() => setDeleteTarget(course)} className="p-2 rounded-lg hover:bg-red-500/20 text-red-400">
+                        <button onClick={() => setDeleteTarget(course)} className="p-2 rounded-lg hover:bg-red-500/20 text-red-400" title="Delete">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

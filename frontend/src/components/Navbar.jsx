@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon, GraduationCap, User, Shield } from "lucide-react";
+import { Menu, X, Sun, Moon, GraduationCap, User, Shield, BookOpen } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 
@@ -64,8 +64,8 @@ export default function Navbar() {
                     <Shield className="w-4 h-4" /> Admin
                   </Link>
                 )}
-                <Link to="/dashboard" className="btn-secondary text-sm py-2 px-4">
-                  Dashboard
+                <Link to="/dashboard" className="btn-secondary text-sm py-2 px-4 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4" /> My Learning
                 </Link>
                 <Link to="/profile" className="p-2 rounded-full glass">
                   <User className="w-5 h-5" />

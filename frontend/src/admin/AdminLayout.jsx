@@ -17,7 +17,9 @@ const titles = {
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const title = titles[location.pathname] || "Admin";
+  // Builder route: /admin/courses/:id/builder
+  const isBuilder = location.pathname.includes("/builder");
+  const title = isBuilder ? "Course Builder" : (titles[location.pathname] || "Admin");
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 flex">
