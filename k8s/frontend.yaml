@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: olp-frontend
   namespace: olp
+  labels:
+    app: olp-frontend
 spec:
   replicas: 2
   selector:
@@ -16,6 +18,7 @@ spec:
       containers:
         - name: frontend
           image: your-dockerhub/olp-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           livenessProbe:
@@ -23,7 +26,14 @@ spec:
               path: /
               port: 80
             initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
           resources:
             requests:
               memory: "64Mi"
@@ -41,6 +51,27 @@ spec:
   selector:
     app: olp-frontend
   ports:
-    - port: 80
+    - name: http
+      port: 80
       targetPort: 80
   type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: olp-frontend-hpa
+  namespace: olp
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: olp-frontend
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70

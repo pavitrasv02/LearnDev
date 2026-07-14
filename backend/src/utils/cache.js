@@ -3,14 +3,32 @@ const logger = require("../config/logger");
 
 const DEFAULT_TTL = 300; // 5 minutes
 
+// Lazy-load metrics to avoid circular dep at startup
+let _metrics = null;
+const getMetrics = () => {
+  if (!_metrics) {
+    try { _metrics = require("../config/metrics"); } catch { /* metrics not available */ }
+  }
+  return _metrics;
+};
+
 async function getCache(key) {
   const redis = getRedis();
-  if (!redis) return null;
+  if (!redis) {
+    getMetrics()?.cacheMisses.inc();
+    return null;
+  }
   try {
     const data = await redis.get(key);
-    return data ? JSON.parse(data) : null;
+    if (data) {
+      getMetrics()?.cacheHits.inc();
+      return JSON.parse(data);
+    }
+    getMetrics()?.cacheMisses.inc();
+    return null;
   } catch (err) {
     logger.warn("Cache get failed", { key, error: err.message });
+    getMetrics()?.cacheMisses.inc();
     return null;
   }
 }
@@ -38,7 +56,7 @@ async function deleteCache(pattern) {
 
 async function withLock(lockKey, fn, ttl = 10) {
   const redis = getRedis();
-  if (!redis) return fn();
+  if (!redis) return fn(); // graceful degradation: run without lock
   const lockValue = Date.now().toString();
   const acquired = await redis.set(lockKey, lockValue, "EX", ttl, "NX");
   if (!acquired) throw new Error("Resource is locked, try again");

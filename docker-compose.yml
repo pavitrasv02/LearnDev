@@ -1,8 +1,15 @@
-# Online Learning Platform — Full Stack DevOps
-# Run: docker compose up --build
-# App: http://localhost (via nginx proxy)
+# LearnDev — Full Stack Docker Compose
+# Usage:
+#   docker compose up --build            (app only)
+#   docker compose --profile monitoring up --build   (app + Prometheus + Grafana)
+#
+# Required env vars in shell or .env file at repo root:
+#   MONGODB_URI   — MongoDB Atlas URI OR leave blank to use local mongodb service
+#   JWT_SECRET    — Long random string
+#   JWT_REFRESH_SECRET — Long random string (different from JWT_SECRET)
 
 services:
+  # ── MongoDB ───────────────────────────────────────────────────────────────
   mongodb:
     image: mongo:7
     container_name: olp-mongodb
@@ -15,11 +22,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 20s
+    restart: unless-stopped
 
+  # ── Redis ─────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine
     container_name: olp-redis
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     networks:
@@ -29,7 +39,10 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 5s
+    restart: unless-stopped
 
+  # ── Backend ───────────────────────────────────────────────────────────────
   backend:
     build:
       context: ./backend
@@ -38,12 +51,25 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      MONGODB_URI:  ${MONGODB_URI}
+      # Use local MongoDB service when MONGODB_URI is not set externally
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongodb:27017/olp}
       REDIS_URL: redis://redis:6379
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-secret}
-      JWT_EXPIRES_IN: 7d
+      JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES:-15m}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-me-refresh-secret-in-production}
+      JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES:-7d}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost}
       CORS_ORIGIN: http://localhost,http://localhost:80,http://localhost:3000
       SEED_ON_START: "true"
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      RATE_LIMIT_WINDOW_MS: "900000"
+      RATE_LIMIT_MAX: "100"
+      # Email — leave blank to use Ethereal in dev
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      EMAIL_FROM: ${EMAIL_FROM:-LearnDev <noreply@learndev.io>}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -53,6 +79,7 @@ services:
       - olp-network
     restart: unless-stopped
 
+  # ── Frontend ──────────────────────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
@@ -64,6 +91,7 @@ services:
       - olp-network
     restart: unless-stopped
 
+  # ── NGINX reverse proxy ───────────────────────────────────────────────────
   nginx:
     image: nginx:alpine
     container_name: olp-nginx
@@ -78,38 +106,53 @@ services:
       - olp-network
     restart: unless-stopped
 
+  # ── Prometheus (monitoring profile) ──────────────────────────────────────
   prometheus:
     image: prom/prometheus:v2.53.0
     container_name: olp-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
     ports:
       - "9090:9090"
     networks:
       - olp-network
     profiles:
       - monitoring
+    restart: unless-stopped
 
+  # ── Grafana (monitoring profile) ─────────────────────────────────────────
   grafana:
     image: grafana/grafana:11.1.0
     container_name: olp-grafana
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
       GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/learndev.json
     ports:
       - "3001:3000"
     volumes:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
     networks:
       - olp-network
     profiles:
       - monitoring
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
   redis_data:
+  prometheus_data:
+  grafana_data:
 
 networks:
   olp-network:

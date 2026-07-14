@@ -26,7 +26,7 @@ router.get("/stats", getStats);
 
 router.get("/users", getUsers);
 router.delete("/users/:id", deleteUser);
-router.patch("/users/:id/role", [body("role").isIn(["user", "admin"])], validate, updateUserRole);
+router.patch("/users/:id/role", [body("role").isIn(["user", "student", "instructor", "admin"])], validate, updateUserRole);
 router.patch("/users/:id/block", toggleBlockUser);
 router.get("/users/:id/enrollments", getUserEnrollments);
 

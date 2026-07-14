@@ -4,14 +4,19 @@ metadata:
   name: olp-ingress
   namespace: olp
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # Proxy cookie settings for httpOnly refresh token
+    nginx.ingress.kubernetes.io/proxy-cookie-path: "/ /"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
 spec:
   ingressClassName: nginx
   rules:
-    - host: learn-dev.local
+    - host: learndev.local
       http:
         paths:
+          # API routes — no rewrite (backend path already includes /api)
           - path: /api
             pathType: Prefix
             backend:
@@ -19,6 +24,15 @@ spec:
                 name: backend-service
                 port:
                   number: 5000
+          # Health check
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: backend-service
+                port:
+                  number: 5000
+          # Frontend SPA
           - path: /
             pathType: Prefix
             backend:

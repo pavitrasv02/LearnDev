@@ -1,0 +1,106 @@
+{
+  "title": "LearnDev — API Overview",
+  "uid": "learndev-overview",
+  "version": 1,
+  "schemaVersion": 38,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP Request Rate (req/s)",
+      "type": "graph",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(olp_http_requests_total[1m])",
+          "legendFormat": "{{method}} {{route}} {{status_code}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "HTTP p95 Response Time (s)",
+      "type": "graph",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(olp_http_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95 {{route}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Error Rate (5xx / min)",
+      "type": "graph",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(olp_http_requests_total{status_code=~\"5..\"}[1m])",
+          "legendFormat": "5xx errors"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Redis Cache Hit Ratio",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(olp_redis_cache_hits_total[5m]) / (rate(olp_redis_cache_hits_total[5m]) + rate(olp_redis_cache_misses_total[5m]))",
+          "legendFormat": "Hit Ratio"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": 0 },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "green", "value": 0.8 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Node.js Heap Used (MB)",
+      "type": "graph",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "olp_nodejs_heap_size_used_bytes / 1024 / 1024",
+          "legendFormat": "Heap Used MB"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Active HTTP Connections",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "olp_active_connections",
+          "legendFormat": "Active Connections"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "CPU Usage",
+      "type": "graph",
+      "gridPos": { "x": 0, "y": 24, "w": 24, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(olp_process_cpu_seconds_total[1m]) * 100",
+          "legendFormat": "CPU %"
+        }
+      ]
+    }
+  ]
+}

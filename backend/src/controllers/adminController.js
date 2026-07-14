@@ -143,7 +143,7 @@ exports.deleteUser = async (req, res, next) => {
 exports.updateUserRole = async (req, res, next) => {
   try {
     const { role } = req.body;
-    if (!["user", "admin"].includes(role)) {
+    if (!["user", "student", "instructor", "admin"].includes(role)) {
       return res.status(400).json({ success: false, message: "Invalid role" });
     }
     const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }).select("-password");

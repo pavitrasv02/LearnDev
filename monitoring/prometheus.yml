@@ -1,21 +1,27 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    project: "learndev"
+    environment: "production"
 
 scrape_configs:
+  # Prometheus self-monitoring
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
 
+  # LearnDev backend — exposes prom-client metrics at /metrics
   - job_name: "olp-backend"
-    metrics_path: /health
+    metrics_path: /metrics
+    scrape_interval: 10s
     static_configs:
       - targets: ["backend:5000"]
         labels:
           service: "olp-api"
+          env: "production"
 
-  - job_name: "nginx"
-    static_configs:
-      - targets: ["nginx:80"]
-        labels:
-          service: "nginx-proxy"
+  # Node Exporter (optional — uncomment if node-exporter is added to compose)
+  # - job_name: "node-exporter"
+  #   static_configs:
+  #     - targets: ["node-exporter:9100"]
