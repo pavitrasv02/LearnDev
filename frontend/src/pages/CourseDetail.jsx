@@ -7,7 +7,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { PageLoader, CourseCardSkeleton } from "../components/Skeleton";
+import { PageLoader } from "../components/Skeleton";
+import ReviewSection from "../components/ReviewSection";
 import api from "../api/axios";
 
 // ── Lesson type icon ──────────────────────────────────────────────────────
@@ -252,6 +253,9 @@ export default function CourseDetail() {
                 </div>
               </div>
             )}
+
+            {/* ── Reviews ──────────────────────────────────────────── */}
+            <ReviewSection courseId={course._id} isEnrolled={isEnrolled} />
           </div>
 
           {/* Right: enroll card (sticky) */}

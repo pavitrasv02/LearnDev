@@ -5,6 +5,7 @@ const Certificate = require("../models/Certificate");
 const User = require("../models/User");
 const { deleteCache } = require("../utils/cache");
 const logger = require("../config/logger");
+const { sendCertificateEmail } = require("../utils/email");
 
 // ── Enroll ─────────────────────────────────────────────────────────────────
 
@@ -122,10 +123,13 @@ exports.markLesson = async (req, res, next) => {
           studentName: req.user.name,
           instructorName: course.instructor,
         });
-        logger.info("Certificate issued", {
-          userId: req.user._id,
-          courseId: course._id,
-          certId: certificate._id,
+        logger.info("Certificate issued", { userId: req.user._id, courseId: course._id, certId: certificate._id });
+        // Send certificate email (non-blocking — never crash on email failure)
+        sendCertificateEmail({
+          to: req.user.email,
+          name: req.user.name,
+          courseTitle: course.title,
+          verificationCode: certificate.verificationCode,
         });
       } catch (dupErr) {
         // Cert already exists (11000) — fetch the existing one

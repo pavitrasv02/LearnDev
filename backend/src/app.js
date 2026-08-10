@@ -18,6 +18,10 @@ const enrollmentRoutes = require("./routes/enrollments");
 const userRoutes = require("./routes/users");
 const adminRoutes = require("./routes/admin");
 const certificateRoutes = require("./routes/certificates");
+const reviewRoutes = require("./routes/reviews");
+const notificationRoutes = require("./routes/notifications");
+const complaintRoutes = require("./routes/complaints");
+const aiRoutes = require("./routes/ai");
 
 const app = express();
 
@@ -117,6 +121,10 @@ app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/certificates", certificateRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/complaints", complaintRoutes);
+app.use("/api/ai", aiRoutes);
+// Reviews are mounted under /api/courses/:courseId/reviews in courses.js
 
 // ── Serve React SPA ───────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, "public")));

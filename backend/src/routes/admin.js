@@ -17,6 +17,11 @@ const {
   changePassword,
   updateProfile,
 } = require("../controllers/adminController");
+const {
+  getAllComplaints,
+  updateComplaint,
+  adminReply,
+} = require("../controllers/complaintController");
 
 const router = express.Router();
 
@@ -58,5 +63,13 @@ router.patch(
   changePassword
 );
 router.put("/settings/profile", updateProfile);
+
+// ── Complaint management ──────────────────────────────────────────────────
+router.get("/complaints", getAllComplaints);
+router.patch("/complaints/:id", updateComplaint);
+router.post("/complaints/:id/reply", [body("message").trim().notEmpty()], validate, adminReply);
+
+// ── AI Analytics insights ─────────────────────────────────────────────────
+router.get("/insights", getStats); // reuses existing stats — frontend uses it for charts
 
 module.exports = router;

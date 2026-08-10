@@ -10,15 +10,19 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  TrendingUp,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const links = [
-  { to: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/admin/courses", icon: BookOpen, label: "Courses" },
-  { to: "/admin/users", icon: Users, label: "Users" },
-  { to: "/admin/enrollments", icon: GraduationCap, label: "Enrollments" },
-  { to: "/admin/settings", icon: Settings, label: "Settings" },
+  { to: "/admin/dashboard",   icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/admin/courses",     icon: BookOpen,        label: "Courses" },
+  { to: "/admin/users",       icon: Users,           label: "Users" },
+  { to: "/admin/enrollments", icon: GraduationCap,   label: "Enrollments" },
+  { to: "/admin/insights",    icon: TrendingUp,      label: "Insights" },
+  { to: "/admin/complaints",  icon: MessageSquare,   label: "Support" },
+  { to: "/admin/settings",    icon: Settings,        label: "Settings" },
 ];
 
 export default function AdminSidebar({ collapsed, onToggle }) {

@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
 const { getRedis } = require("../config/redis");
-const { sendEmail } = require("../utils/email");
+const { sendEmail, sendWelcomeEmail, sendVerificationEmail, sendPasswordResetEmail } = require("../utils/email");
 const logger = require("../config/logger");
 
 // ── Token helpers ─────────────────────────────────────────────────────────
@@ -71,19 +71,7 @@ exports.register = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     const verifyUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/verify-email/${verifyToken}`;
-    await sendEmail({
-      to: email,
-      subject: "Welcome to LearnDev — Verify your email",
-      html: `
-        <h2>Welcome to LearnDev, ${name}!</h2>
-        <p>Please verify your email address by clicking the link below:</p>
-        <a href="${verifyUrl}" style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">
-          Verify Email
-        </a>
-        <p>This link expires in 24 hours.</p>
-        <p>If you didn't create an account, you can safely ignore this email.</p>
-      `,
-    });
+    await sendVerificationEmail({ to: email, name, verifyUrl });
 
     logger.info("User registered", { userId: user._id, email, role: assignedRole });
     sendTokenResponse(user, 201, res);
@@ -233,19 +221,7 @@ exports.forgotPassword = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     const resetUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/reset-password/${resetToken}`;
-
-    await sendEmail({
-      to: user.email,
-      subject: "LearnDev — Password Reset Request",
-      html: `
-        <h2>Password Reset</h2>
-        <p>You requested a password reset. Click the link below (valid for 10 minutes):</p>
-        <a href="${resetUrl}" style="background:#6366f1;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;">
-          Reset Password
-        </a>
-        <p>If you didn't request this, please ignore this email. Your password won't change.</p>
-      `,
-    });
+    await sendPasswordResetEmail({ to: user.email, name: user.name, resetUrl });
 
     logger.info("Password reset email sent", { userId: user._id });
     res.json({ success: true, message: "If that email exists, a reset link has been sent." });

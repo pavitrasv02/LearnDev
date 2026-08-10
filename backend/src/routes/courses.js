@@ -13,6 +13,8 @@ const {
 const { protect, authorize } = require("../middleware/auth");
 const validate = require("../middleware/validate");
 const sectionRoutes = require("./sections");
+const reviewRoutes = require("./reviews");
+const bookmarkRoutes = require("./bookmarks");
 
 const router = express.Router();
 
@@ -42,5 +44,9 @@ router.delete("/:id", protect, authorize("admin", "instructor"), deleteCourse);
 
 // Mount section routes under /api/courses/:courseId/sections
 router.use("/:courseId/sections", sectionRoutes);
+// Mount review routes under /api/courses/:courseId/reviews
+router.use("/:courseId/reviews", reviewRoutes);
+// Mount bookmark toggle under /api/courses/:courseId/bookmark
+router.use("/:courseId/bookmark", bookmarkRoutes);
 
 module.exports = router;

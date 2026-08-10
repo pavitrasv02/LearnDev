@@ -18,12 +18,16 @@ import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 import AccessDenied from "./pages/AccessDenied";
+import Support from "./pages/Support";
+import AIMentor from "./pages/AIMentor";
 
 import AdminDashboard from "./admin/pages/AdminDashboard";
 import AdminCourses from "./admin/pages/AdminCourses";
 import AdminUsers from "./admin/pages/AdminUsers";
 import AdminEnrollments from "./admin/pages/AdminEnrollments";
 import AdminSettings from "./admin/pages/AdminSettings";
+import AdminInsights from "./admin/pages/AdminInsights";
+import AdminComplaints from "./admin/pages/AdminComplaints";
 import CourseBuilder from "./admin/pages/CourseBuilder";
 
 function MainLayout({ children }) {
@@ -62,6 +66,16 @@ export default function App() {
             <ProtectedRoute><Profile /></ProtectedRoute>
           </MainLayout>
         } />
+        <Route path="/support" element={
+          <MainLayout>
+            <ProtectedRoute><Support /></ProtectedRoute>
+          </MainLayout>
+        } />
+        <Route path="/ai-mentor" element={
+          <MainLayout>
+            <ProtectedRoute><AIMentor /></ProtectedRoute>
+          </MainLayout>
+        } />
 
         {/* Learn page — full-screen, no Navbar/Footer */}
         <Route path="/learn/:slug" element={
@@ -78,6 +92,8 @@ export default function App() {
           <Route path="courses/:courseId/builder" element={<CourseBuilder />} />
           <Route path="users"       element={<AdminUsers />} />
           <Route path="enrollments" element={<AdminEnrollments />} />
+          <Route path="insights"    element={<AdminInsights />} />
+          <Route path="complaints"  element={<AdminComplaints />} />
           <Route path="settings"    element={<AdminSettings />} />
         </Route>
 

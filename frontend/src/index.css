@@ -2,49 +2,136 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── CSS variables for smooth theme transitions ──────────────────────────── */
 @layer base {
+  :root {
+    --bg-primary: 255 255 255;
+    --bg-secondary: 248 250 252;
+    --text-primary: 17 24 39;
+    --text-secondary: 107 114 128;
+    --border-color: 229 231 235;
+    --card-bg: 255 255 255;
+    color-scheme: light;
+  }
+
+  .dark {
+    --bg-primary: 3 7 18;
+    --bg-secondary: 17 24 39;
+    --text-primary: 249 250 251;
+    --text-secondary: 156 163 175;
+    --border-color: 55 65 81;
+    --card-bg: 17 24 39;
+    color-scheme: dark;
+  }
+
   html {
     scroll-behavior: smooth;
   }
+
   body {
-    @apply font-sans antialiased transition-colors duration-300;
+    @apply font-sans antialiased;
+    background-color: rgb(var(--bg-primary));
+    color: rgb(var(--text-primary));
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Smooth theme transition for all elements */
+  *,
+  *::before,
+  *::after {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.1s ease;
+  }
+
+  /* Override transition for animations/interactions where we DON'T want the delay */
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.1s ease,
+      box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   }
 }
 
 @layer components {
+  /* ── Glass morphism ──────────────────────────────────────────────────── */
   .glass {
-    @apply backdrop-blur-xl bg-white/10 dark:bg-white/5 border border-white/20 shadow-glass;
+    @apply backdrop-blur-xl bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 shadow-glass;
   }
+
   .glass-card {
-    @apply backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl shadow-lg;
+    @apply backdrop-blur-md bg-white dark:bg-gray-900/80
+           border border-gray-200 dark:border-gray-700/50
+           rounded-2xl shadow-lg;
   }
+
+  /* ── Buttons ─────────────────────────────────────────────────────────── */
   .btn-primary {
     @apply px-6 py-3 bg-gradient-to-r from-brand-600 to-accent-violet text-white font-semibold rounded-xl
            hover:from-brand-500 hover:to-accent-violet/90 transition-all duration-300
            shadow-lg hover:shadow-glow hover:-translate-y-0.5 active:translate-y-0;
   }
+
   .btn-secondary {
-    @apply px-6 py-3 glass text-gray-800 dark:text-white font-semibold rounded-xl
-           hover:bg-white/20 transition-all duration-300;
+    @apply px-6 py-3 bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-white font-semibold rounded-xl
+           border border-gray-200 dark:border-white/10
+           hover:bg-gray-200 dark:hover:bg-white/20 transition-all duration-300;
   }
+
+  /* ── Typography ──────────────────────────────────────────────────────── */
   .gradient-text {
     @apply bg-gradient-to-r from-brand-500 via-accent-violet to-accent-pink bg-clip-text text-transparent;
   }
+
+  /* ── Layout ──────────────────────────────────────────────────────────── */
   .section-padding {
     @apply py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto;
   }
+
+  /* ── Loading skeleton ────────────────────────────────────────────────── */
   .skeleton {
     @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded-lg;
   }
+
+  /* ── Admin-specific overrides (dark panel) ───────────────────────────── */
+  .admin-surface {
+    @apply bg-gray-900/60 border border-gray-800;
+  }
+
+  .admin-card {
+    @apply bg-gray-900/60 border border-gray-800 rounded-2xl;
+  }
+
+  /* ── Input base ──────────────────────────────────────────────────────── */
+  .input-base {
+    @apply w-full px-4 py-3 rounded-xl
+           bg-gray-100 dark:bg-gray-800
+           border border-gray-200 dark:border-gray-700
+           text-gray-900 dark:text-white
+           placeholder-gray-400 dark:placeholder-gray-500
+           focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           outline-none transition-shadow;
+  }
+
+  /* ── Badge ───────────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  .badge-green  { @apply bg-green-100  dark:bg-green-900/30  text-green-700  dark:text-green-400; }
+  .badge-red    { @apply bg-red-100    dark:bg-red-900/30    text-red-700    dark:text-red-400; }
+  .badge-yellow { @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400; }
+  .badge-blue   { @apply bg-blue-100   dark:bg-blue-900/30   text-blue-700   dark:text-blue-400; }
+  .badge-violet { @apply bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400; }
+  .badge-gray   { @apply bg-gray-100   dark:bg-gray-800      text-gray-700   dark:text-gray-400; }
+
+  /* ── Star rating ─────────────────────────────────────────────────────── */
+  .star-filled  { @apply text-yellow-400 fill-yellow-400; }
+  .star-empty   { @apply text-gray-300 dark:text-gray-600; }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-900;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-brand-500 rounded-full;
-}
+/* ── Custom scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { @apply bg-gray-100 dark:bg-gray-900; }
+::-webkit-scrollbar-thumb { @apply bg-brand-400 dark:bg-brand-600 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-brand-500; }

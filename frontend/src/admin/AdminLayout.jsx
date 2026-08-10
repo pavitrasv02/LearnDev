@@ -11,6 +11,8 @@ const titles = {
   "/admin/courses": "Course Management",
   "/admin/users": "User Management",
   "/admin/enrollments": "Enrollment Management",
+  "/admin/insights": "Content Insights",
+  "/admin/complaints": "Support Tickets",
   "/admin/settings": "Settings",
 };
 
@@ -22,7 +24,7 @@ export default function AdminLayout() {
   const title = isBuilder ? "Course Builder" : (titles[location.pathname] || "Admin");
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-100 flex">
+    <div className="min-h-screen bg-gray-950 dark:bg-gray-950 bg-white text-gray-900 dark:text-gray-100 flex">
       <Toaster
         position="top-right"
         toastOptions={{

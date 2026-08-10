@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon, GraduationCap, User, Shield, BookOpen } from "lucide-react";
+import { Menu, X, Sun, Moon, GraduationCap, User, Shield, BookOpen, Sparkles } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -57,6 +58,9 @@ export default function Navbar() {
               {dark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
+            {/* Notification Bell — only when logged in */}
+            <NotificationBell />
+
             {user ? (
               <div className="hidden md:flex items-center gap-3">
                 {user.role === "admin" && (
@@ -66,6 +70,12 @@ export default function Navbar() {
                 )}
                 <Link to="/dashboard" className="btn-secondary text-sm py-2 px-4 flex items-center gap-1.5">
                   <BookOpen className="w-4 h-4" /> My Learning
+                </Link>
+                <Link to="/support" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-brand-500 transition-colors">
+                  Support
+                </Link>
+                <Link to="/ai-mentor" className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-brand-500/10 to-violet-500/10 text-brand-600 dark:text-brand-400 hover:from-brand-500/20 hover:to-violet-500/20 transition-all border border-brand-500/20">
+                  <Sparkles className="w-3.5 h-3.5" /> AI Mentor
                 </Link>
                 <Link to="/profile" className="p-2 rounded-full glass">
                   <User className="w-5 h-5" />

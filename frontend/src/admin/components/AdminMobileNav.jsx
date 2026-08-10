@@ -1,12 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, BookOpen, Users, GraduationCap, Settings } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, GraduationCap, Settings, TrendingUp, MessageSquare } from "lucide-react";
 
 const links = [
-  { to: "/admin/dashboard", icon: LayoutDashboard, label: "Home" },
-  { to: "/admin/courses", icon: BookOpen, label: "Courses" },
-  { to: "/admin/users", icon: Users, label: "Users" },
-  { to: "/admin/enrollments", icon: GraduationCap, label: "Enroll" },
-  { to: "/admin/settings", icon: Settings, label: "Settings" },
+  { to: "/admin/dashboard",   icon: LayoutDashboard, label: "Home" },
+  { to: "/admin/courses",     icon: BookOpen,        label: "Courses" },
+  { to: "/admin/users",       icon: Users,           label: "Users" },
+  { to: "/admin/insights",    icon: TrendingUp,      label: "Insights" },
+  { to: "/admin/complaints",  icon: MessageSquare,   label: "Support" },
 ];
 
 export default function AdminMobileNav() {
